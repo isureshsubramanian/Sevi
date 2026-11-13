@@ -7,13 +7,16 @@
 <p align="center">Sound levels in your terminal prompt, for zsh on macOS.</p>
 
 <p align="center">
-  <img src="Assets/prompt.svg" width="720" alt="A terminal prompt with mic -41 in red and out -14 in green at the right edge">
+  <img src="Assets/prompt.svg" width="720" alt="A terminal with two prompts: one shows mic -41 in red and out -14 in green at the right edge, the other shows the same reading with a microphone icon and a speaker icon">
 </p>
 
 Sevi adds two live readings to the right edge of your zsh prompt:
 
 - **mic** is how loud your surroundings are, measured by the default input device.
 - **out** is how loud the audio your Mac is playing is.
+
+The words are the default. With a Nerd Font you can show icons in their place,
+as in the second line of the picture; see [Settings](#settings).
 
 It is useful when you wear headphones or hearing devices and want to see at a
 glance how loud the room is, or how loud you are playing something.

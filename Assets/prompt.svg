@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Illustration of a terminal prompt with Sevi's reading at the right edge, colour on. Original artwork for this project. -->
-<svg xmlns="http://www.w3.org/2000/svg" width="880" height="132" viewBox="0 0 880 132" role="img" aria-label="A terminal prompt with mic -41 in red and out -14 in green at the right edge">
-  <rect width="880" height="132" rx="12" fill="#1E2130"/>
+<!-- Illustration of a terminal with Sevi's reading at the right edge of two prompts, colour on: first with words, then with icons. Original artwork for this project. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="880" height="172" viewBox="0 0 880 172" role="img" aria-label="A terminal with two prompts. The first shows mic -41 in red and out -14 in green at the right edge. The second shows the same reading with a microphone icon and a speaker icon in place of the words.">
+  <rect width="880" height="172" rx="12" fill="#1E2130"/>
   <rect width="880" height="36" rx="12" fill="#2A2D3E"/>
   <rect y="24" width="880" height="12" fill="#2A2D3E"/>
   <circle cx="24" cy="18" r="6" fill="#FF5F57"/>
@@ -9,17 +9,23 @@
   <circle cx="64" cy="18" r="6" fill="#28C840"/>
 
   <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="20">
+    <!-- Words, the default: mic -41 with a low bar, out -14 with a high bar -->
     <text x="24" y="92" fill="#C8CCE0">you@mac ~/project %</text>
-    <rect x="262" y="74" width="11" height="24" fill="#C8CCE0" opacity="0.7"/>
-
-    <!-- mic -41 with a low bar -->
     <text x="560" y="92" fill="#FF6B6B">mic -41</text>
     <rect x="652" y="89" width="12" height="6" fill="#FF6B6B"/>
-
     <text x="676" y="92" fill="#8A8FA8">·</text>
-
-    <!-- out -14 with a high bar -->
     <text x="700" y="92" fill="#4ADE80">out -14</text>
     <rect x="792" y="77" width="12" height="18" fill="#4ADE80"/>
+
+    <!-- The same reading with icons in place of the words -->
+    <text x="24" y="132" fill="#C8CCE0">you@mac ~/project %</text>
+    <rect x="262" y="114" width="11" height="24" fill="#C8CCE0" opacity="0.7"/>
+    <g transform="translate(592 115) scale(1.25)"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5" fill="#FF6B6B"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0" fill="none" stroke="#FF6B6B" stroke-width="1.3" stroke-linecap="round"/><path d="M8 12v2.5M5.5 14.5h5" fill="none" stroke="#FF6B6B" stroke-width="1.3" stroke-linecap="round"/></g>
+    <text x="620" y="132" fill="#FF6B6B">-41</text>
+    <rect x="668" y="129" width="12" height="6" fill="#FF6B6B"/>
+    <text x="692" y="132" fill="#8A8FA8">·</text>
+    <g transform="translate(716 115) scale(1.25)"><path d="M2 6h3l4-3.5v11L5 10H2z" fill="#4ADE80"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5M12.6 3.5a6 6 0 0 1 0 9" fill="none" stroke="#4ADE80" stroke-width="1.3" stroke-linecap="round"/></g>
+    <text x="744" y="132" fill="#4ADE80">-14</text>
+    <rect x="792" y="117" width="12" height="18" fill="#4ADE80"/>
   </g>
 </svg>
