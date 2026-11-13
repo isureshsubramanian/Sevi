@@ -24,3 +24,6 @@ ditto -c -k --keepParent build/Sevi.app "$archive"
 
 spctl --assess --type execute --verbose=2 build/Sevi.app
 echo "release ready: $archive"
+echo "for the Homebrew cask:"
+echo "  version \"$version\""
+echo "  sha256 \"$(shasum -a 256 "$archive" | cut -d' ' -f1)\""
