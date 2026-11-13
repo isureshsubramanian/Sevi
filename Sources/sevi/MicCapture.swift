@@ -22,13 +22,28 @@ final class MicCapture: @unchecked Sendable {
         // Until permission is granted the microphone is closed, which reads the
         // same to the prompt as a denial.
         var state: MicState = .denied
+        var callbacks = 0
+        var loudest = LevelMath.floorDBFS
     }
 
     private let shared = OSAllocatedUnfairLock(initialState: Shared())
     private let engine = AVAudioEngine()
     private var tapInstalled = false
+    private var configurationObserver: NSObjectProtocol?
 
     func start() {
+        // The engine stops itself when the input device or its format changes
+        // (for example a headset is plugged in), so capture is set up again.
+        configurationObserver = NotificationCenter.default.addObserver(
+            forName: .AVAudioEngineConfigurationChange, object: engine, queue: .main
+        ) { [weak self] _ in
+            guard let self, AVCaptureDevice.authorizationStatus(for: .audio) == .authorized else { return }
+            Log.helper.notice("input device changed")
+            self.removeTap()
+            self.engine.stop()
+            self.startEngine()
+        }
+
         switch AVCaptureDevice.authorizationStatus(for: .audio) {
         case .authorized:
             startEngine()
@@ -48,11 +63,24 @@ final class MicCapture: @unchecked Sendable {
     }
 
     func stop() {
+        if let configurationObserver {
+            NotificationCenter.default.removeObserver(configurationObserver)
+            self.configurationObserver = nil
+        }
+        removeTap()
+        engine.stop()
+    }
+
+    private func removeTap() {
         if tapInstalled {
             engine.inputNode.removeTap(onBus: 0)
             tapInstalled = false
         }
-        engine.stop()
+    }
+
+    /// Counts for a bounded self-test run: numbers only.
+    func diagnostics() -> (callbacks: Int, loudest: Double) {
+        shared.withLock { ($0.callbacks, $0.loudest) }
     }
 
     func reading() -> Reading {
@@ -69,7 +97,10 @@ final class MicCapture: @unchecked Sendable {
         let input = engine.inputNode
         let format = input.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else {
-            shared.withLock { $0.state = .nodevice }
+            shared.withLock {
+                $0.meter = nil
+                $0.state = .nodevice
+            }
             Log.helper.notice("no input device")
             return
         }
@@ -83,7 +114,11 @@ final class MicCapture: @unchecked Sendable {
         input.installTap(onBus: 0, bufferSize: 4096, format: format) { buffer, _ in
             guard let channels = buffer.floatChannelData else { return }
             let samples = UnsafeBufferPointer(start: channels[0], count: Int(buffer.frameLength))
-            shared.withLockUnchecked { $0.meter?.process(samples) }
+            shared.withLockUnchecked {
+                $0.meter?.process(samples)
+                $0.callbacks += 1
+                $0.loudest = max($0.loudest, $0.meter?.level ?? LevelMath.floorDBFS)
+            }
         }
         tapInstalled = true
 
@@ -91,8 +126,7 @@ final class MicCapture: @unchecked Sendable {
             try engine.start()
             Log.helper.notice("microphone capture started")
         } catch {
-            input.removeTap(onBus: 0)
-            tapInstalled = false
+            removeTap()
             shared.withLock {
                 $0.meter = nil
                 $0.state = .nodevice

@@ -313,3 +313,36 @@ import Testing
         #expect(InstanceLock.acquire(path: path) == nil)
     }
 }
+
+@Suite struct CurrentStatePathsTests {
+    /// The app is opened by macOS and never sees a shell's TMPDIR, so the real
+    /// path must not follow it.
+    @Test func ignoresTheTmpdirVariable() {
+        let before = StatePaths.current()
+        let saved = getenv("TMPDIR").map { String(cString: $0) }
+        setenv("TMPDIR", "/somewhere/else", 1)
+        defer {
+            if let saved { setenv("TMPDIR", saved, 1) } else { unsetenv("TMPDIR") }
+        }
+        #expect(StatePaths.current() == before)
+        #expect(before.directory.hasSuffix("/sevi-\(getuid())"))
+        #expect(!before.directory.hasPrefix("/somewhere"))
+    }
+}
+
+@Suite struct TapFormatTests {
+    @Test func interleavedStereoCountsBothChannels() {
+        #expect(TapFormat.meterSampleRate(sampleRate: 16_000, channels: 2, isInterleaved: true, isFloat32: true) == 32_000)
+    }
+
+    @Test func nonInterleavedUsesOneChannel() {
+        #expect(TapFormat.meterSampleRate(sampleRate: 48_000, channels: 2, isInterleaved: false, isFloat32: true) == 48_000)
+    }
+
+    @Test func rejectsFormatsTheMeterCannotRead() {
+        #expect(TapFormat.meterSampleRate(sampleRate: 48_000, channels: 2, isInterleaved: true, isFloat32: false) == nil)
+        #expect(TapFormat.meterSampleRate(sampleRate: 0, channels: 2, isInterleaved: true, isFloat32: true) == nil)
+        #expect(TapFormat.meterSampleRate(sampleRate: .nan, channels: 2, isInterleaved: true, isFloat32: true) == nil)
+        #expect(TapFormat.meterSampleRate(sampleRate: 48_000, channels: 0, isInterleaved: true, isFloat32: true) == nil)
+    }
+}
