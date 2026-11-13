@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Illustration of Sevi's reading with icons and colour on: a red microphone icon with -41 and a low bar, a grey crossed-out speaker icon. Original artwork for this project. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="133" height="28" viewBox="0 0 133 28" role="img" aria-label="a red microphone icon with -41 and a low bar, a grey crossed-out speaker icon">
+  <rect width="133" height="28" rx="6" fill="#1E2130"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <g transform="translate(10 6)"><rect x="5.5" y="1.5" width="5" height="8" rx="2.5" fill="#FF6B6B"/><path d="M3.5 7.5a4.5 4.5 0 0 0 9 0" fill="none" stroke="#FF6B6B" stroke-width="1.3" stroke-linecap="round"/><path d="M8 12v2.5M5.5 14.5h5" fill="none" stroke="#FF6B6B" stroke-width="1.3" stroke-linecap="round"/></g>
+    <text x="35" y="19" textLength="27" lengthAdjust="spacingAndGlyphs" fill="#FF6B6B">-41</text>
+    <rect x="71" y="18" width="9" height="4" fill="#FF6B6B"/>
+    <text x="89" y="19" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#8A8FA8">·</text>
+    <g transform="translate(107 6)"><path d="M2 6h3l4-3.5v11L5 10H2z" fill="#8A8FA8"/><path d="M2.5 2l11 12.5" stroke="#1E2130" stroke-width="3.2" stroke-linecap="round"/><path d="M2.5 2l11 12.5" stroke="#8A8FA8" stroke-width="1.3" stroke-linecap="round"/></g>
+  </g>
+</svg>

@@ -110,15 +110,17 @@ the prompt starts it.
 
 ## What the prompt shows
 
-| Prompt | Meaning |
-|---|---|
-| <img src="Assets/reading-both.svg" alt="mic -41 ▂ · out -14 ▆"> | Both levels, in dBFS. |
-| <img src="Assets/reading-mic-off.svg" alt="mic off · out -14 ▆"> | The microphone is not available: permission was not granted, or there is no input device. |
-| <img src="Assets/reading-out-off.svg" alt="mic -41 ▂ · out off"> | Output capture is not available. |
-| <img src="Assets/reading-stale.svg" alt="mic -- · out --"> | No fresh reading: Sevi is not listening, or it is just starting. |
+| Prompt | With icons | Meaning |
+|---|---|---|
+| <img src="Assets/reading-both.svg" alt="mic -41 ▂ · out -14 ▆"> | <img src="Assets/icons-both.svg" alt="microphone icon -41 ▂ · speaker icon -14 ▆"> | Both levels, in dBFS. |
+| <img src="Assets/reading-mic-off.svg" alt="mic off · out -14 ▆"> | <img src="Assets/icons-mic-off.svg" alt="crossed-out microphone icon · speaker icon -14 ▆"> | The microphone is not available: permission was not granted, or there is no input device. |
+| <img src="Assets/reading-out-off.svg" alt="mic -41 ▂ · out off"> | <img src="Assets/icons-out-off.svg" alt="microphone icon -41 ▂ · crossed-out speaker icon"> | Output capture is not available. |
+| <img src="Assets/reading-stale.svg" alt="mic -- · out --"> | <img src="Assets/icons-stale.svg" alt="microphone icon -- · speaker icon --"> | No fresh reading: Sevi is not listening, or it is just starting. |
 
 The pictures show the reading with `SEVI_COLOR=1`. Without it, the same text
-appears in your prompt's own colour.
+appears in your prompt's own colour. The second column adds `SEVI_ICONS=1`,
+which needs a Nerd Font in the terminal; the exact shape of the icons depends
+on that font. Both are described under [Settings](#settings).
 
 A prompt is drawn once and then stays as it is, so by default the reading
 updates each time a new prompt appears. If your theme already uses the right
