@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Sevi app icon: an ear with sound waves arriving. Original artwork for this project. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12305C"/>
+      <stop offset="1" stop-color="#0A1830"/>
+    </linearGradient>
+  </defs>
+
+  <rect x="100" y="100" width="824" height="824" rx="186" fill="url(#background)"/>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Sound waves, growing as they travel towards the ear -->
+    <g stroke="#5EEAD4" stroke-width="34">
+      <path d="M 232 462 Q 262 512 232 562" opacity="0.55"/>
+      <path d="M 300 412 Q 352 512 300 612" opacity="0.8"/>
+      <path d="M 372 362 Q 446 512 372 662"/>
+    </g>
+
+    <!-- Ear: outer rim down to the lobe, then the inner fold -->
+    <g stroke="#FFFFFF" stroke-width="46">
+      <path d="M 500 452 C 500 334 578 252 684 252 C 796 252 872 336 872 446 C 872 552 800 596 760 656 C 724 710 730 786 652 798 C 600 806 560 780 548 738"/>
+      <path d="M 604 452 C 604 396 638 360 686 360 C 734 360 766 396 766 444 C 766 494 724 512 700 548 C 688 566 686 586 670 598"/>
+    </g>
+  </g>
+</svg>

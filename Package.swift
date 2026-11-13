@@ -6,6 +6,7 @@ let package = Package(
     platforms: [.macOS("14.2")],
     targets: [
         .target(name: "SeviCore"),
+        .executableTarget(name: "sevi", dependencies: ["SeviCore"]),
         .testTarget(name: "SeviCoreTests", dependencies: ["SeviCore"]),
     ]
 )

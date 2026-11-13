@@ -1,0 +1,34 @@
+#!/bin/sh
+# Builds build/Sevi.app: the helper binary, its Info.plist and icon, signed.
+#
+# The helper must be a Developer ID-signed app bundle, even for development:
+# macOS names the microphone prompt after the signed, installed app, and stores
+# the permission against its identifier. An unsigned or ad hoc build is not
+# named "Sevi" in that prompt.
+#
+# Signing uses the first "Developer ID Application" certificate in the keychain;
+# set SEVI_SIGN_IDENTITY to choose another.
+set -eu
+cd "$(dirname "$0")/.."
+
+swift build -c release --product sevi
+binary="$(swift build -c release --show-bin-path)/sevi"
+
+rm -rf build/Sevi.app
+mkdir -p build/Sevi.app/Contents/MacOS build/Sevi.app/Contents/Resources
+cp "$binary" build/Sevi.app/Contents/MacOS/sevi
+cp Packaging/Info.plist build/Sevi.app/Contents/Info.plist
+cp Packaging/AppIcon.icns build/Sevi.app/Contents/Resources/AppIcon.icns
+
+identity="${SEVI_SIGN_IDENTITY:-$(security find-identity -v -p codesigning | awk '/Developer ID Application/ { print $2; exit }')}"
+if [ -z "$identity" ]; then
+    echo "No Developer ID Application certificate found. Set SEVI_SIGN_IDENTITY." >&2
+    exit 1
+fi
+
+# Hardened runtime is required for notarisation; the entitlement lets a
+# hardened build open the microphone. No timestamp here: release signing adds it.
+codesign --force --options runtime --timestamp=none \
+    --entitlements Packaging/Sevi.entitlements -s "$identity" build/Sevi.app
+codesign --verify --strict build/Sevi.app
+echo "built build/Sevi.app"

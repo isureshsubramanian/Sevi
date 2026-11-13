@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key>
+    <string>com.nerttiyana.sevi</string>
+    <key>CFBundleName</key>
+    <string>Sevi</string>
+    <key>CFBundleDisplayName</key>
+    <string>Sevi</string>
+    <key>CFBundleExecutable</key>
+    <string>sevi</string>
+    <key>CFBundleIconFile</key>
+    <string>AppIcon</string>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleInfoDictionaryVersion</key>
+    <string>6.0</string>
+    <key>CFBundleShortVersionString</key>
+    <string>0.1.0</string>
+    <key>CFBundleVersion</key>
+    <string>1</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>14.2</string>
+    <key>LSUIElement</key>
+    <true/>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Sevi measures how loud your surroundings are and shows the level in your terminal prompt. Audio is never recorded or stored.</string>
+    <key>NSAudioCaptureUsageDescription</key>
+    <string>Sevi measures how loud this Mac's own audio is and shows the level in your terminal prompt. Audio is never recorded or stored.</string>
+</dict>
+</plist>
