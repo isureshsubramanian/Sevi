@@ -9,7 +9,7 @@
 #
 # Settings, read from the environment:
 #   SEVI_LIVE=1    redraw the reading once a second while the prompt is empty
-#   SEVI_COLOR=1   colour the level bars (ignored when NO_COLOR is set)
+#   SEVI_COLOR=1   show mic in red and out in green (ignored when NO_COLOR is set)
 #
 # State file, one line (contract version 1):
 #   1 <unix ms> <mic dBFS> <mic peak> <out dBFS> <out peak> <mic state> <out state>
@@ -86,12 +86,11 @@ _sevi_channel() {
     REPLY="$1 $shown ${glyphs[index]}"
     return 0
   fi
-  # Colour repeats what the number and bar height already say; it is never the
-  # only signal. Green is comfortable, yellow is loud, red is close to clipping.
+  # Colour tells the two channels apart at a glance: mic red, out green. The
+  # labels say the same thing, so colour is never the only signal.
   local colour=green
-  (( level >= -20 )) && colour=yellow
-  (( level >= -6 )) && colour=red
-  REPLY="%F{244}$1%f $shown %F{$colour}${glyphs[index]}%f"
+  [[ $1 == mic ]] && colour=red
+  REPLY="%F{$colour}$1 $shown ${glyphs[index]}%f"
 }
 
 # Sets REPLY to the prompt segment for state line $1 at time $2 (Unix ms).

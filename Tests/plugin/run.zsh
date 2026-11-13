@@ -131,16 +131,16 @@ check hook-fresh-reading 'mic -41 ▂ · out -14 ▆' $RPROMPT
 
 check hook-is-registered 1 ${precmd_functions[(I)_sevi_precmd]}
 
-# Colour is opt-in and repeats what the number and bar already say.
+# Colour is opt-in: mic red, out green, whatever the level; off and stale grey.
 COLOUR_STALE='%F{244}mic -- · out --%f'
 _sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $T 1
-check colour-green-and-yellow '%F{244}mic%f -41 %F{green}▂%f · %F{244}out%f -14 %F{yellow}▆%f' $REPLY
-_sevi_segment "1 $T -20.1 -20.1 -20.0 -20.0 ok ok" $T 1
-check colour-yellow-starts-at-20 '%F{244}mic%f -20 %F{green}▅%f · %F{244}out%f -20 %F{yellow}▅%f' $REPLY
-_sevi_segment "1 $T -6.1 -6.1 -6.0 -6.0 ok ok" $T 1
-check colour-red-starts-at-6 '%F{244}mic%f -6 %F{yellow}▇%f · %F{244}out%f -6 %F{red}▇%f' $REPLY
+check colour-mic-red-out-green '%F{red}mic -41 ▂%f · %F{green}out -14 ▆%f' $REPLY
+_sevi_segment "1 $T 0.0 0.0 -120.0 -120.0 ok ok" $T 1
+check colour-does-not-follow-level '%F{red}mic 0 █%f · %F{green}out -120 ▁%f' $REPLY
 _sevi_segment "1 $T -120.0 -120.0 -13.8 -9.0 denied ok" $T 1
-check colour-off '%F{244}mic off%f · %F{244}out%f -14 %F{yellow}▆%f' $REPLY
+check colour-mic-off '%F{244}mic off%f · %F{green}out -14 ▆%f' $REPLY
+_sevi_segment "1 $T -41.2 -28.5 -120.0 -120.0 ok unsupported" $T 1
+check colour-out-off '%F{red}mic -41 ▂%f · %F{244}out off%f' $REPLY
 _sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $(( T + 2001 )) 1
 check colour-stale $COLOUR_STALE $REPLY
 _sevi_segment '1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok%F{red}%n%f' $T 1

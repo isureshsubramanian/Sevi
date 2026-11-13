@@ -74,7 +74,7 @@ Set these in `.zshrc`, before the `source` line.
 | Setting | Effect |
 |---|---|
 | `export SEVI_LIVE=1` | Updates the reading once a second while the command line is empty. It never redraws while you are typing or a completion menu is open. It uses the shell's idle timer, so it stays off if you already use `TMOUT` or `TRAPALRM`. |
-| `export SEVI_COLOR=1` | Colours the bar: green below -20 dBFS, yellow from -20, red from -6. Colour only repeats what the number and the bar already say. It is ignored when `NO_COLOR` is set. |
+| `export SEVI_COLOR=1` | Shows the mic reading in red and the out reading in green, so the two are easy to tell apart. `off` and `--` are grey. The labels say the same thing, so nothing depends on colour alone. It is ignored when `NO_COLOR` is set. |
 
 ## Commands
 
