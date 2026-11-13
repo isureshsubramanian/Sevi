@@ -122,7 +122,7 @@ make gate               # unit tests and prompt tests
 sh Scripts/build-app.sh # builds and signs build/Sevi.app
 ```
 
-The app icon is generated from `Assets/AppIcon.svg` by `Scripts/make-icon.sh`.
+The app icon is rendered from `Assets/AppIcon.svg` during the build.
 
 ## Licence
 

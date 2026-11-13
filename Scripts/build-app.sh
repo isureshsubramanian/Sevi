@@ -12,13 +12,18 @@ set -eu
 cd "$(dirname "$0")/.."
 
 swift build -c release --product sevi
+
+# The icon is rendered from the SVG, again only when the SVG is newer.
+if [ ! -f build/AppIcon.icns ] || [ Assets/AppIcon.svg -nt build/AppIcon.icns ]; then
+    sh Scripts/make-icon.sh
+fi
 binary="$(swift build -c release --show-bin-path)/sevi"
 
 rm -rf build/Sevi.app
 mkdir -p build/Sevi.app/Contents/MacOS build/Sevi.app/Contents/Resources
 cp "$binary" build/Sevi.app/Contents/MacOS/sevi
 cp Packaging/Info.plist build/Sevi.app/Contents/Info.plist
-cp Packaging/AppIcon.icns build/Sevi.app/Contents/Resources/AppIcon.icns
+cp build/AppIcon.icns build/Sevi.app/Contents/Resources/AppIcon.icns
 cp sevi.plugin.zsh build/Sevi.app/Contents/Resources/sevi.plugin.zsh
 
 identity="${SEVI_SIGN_IDENTITY:-$(security find-identity -v -p codesigning | awk '/Developer ID Application/ { print $2; exit }')}"
