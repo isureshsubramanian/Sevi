@@ -1,17 +1,37 @@
-# Sevi
+<p align="center">
+  <img src="Assets/AppIcon.svg" width="128" alt="Sevi icon: an ear with sound waves arriving">
+</p>
 
-Sevi shows two sound levels at the right edge of your zsh prompt on macOS:
+<h1 align="center">Sevi</h1>
 
-```
-suresh@mac ~/src %                                    mic -41 ▂ · out -14 ▆
-```
+<p align="center">Sound levels in your terminal prompt, for zsh on macOS.</p>
+
+<p align="center">
+  <img src="Assets/prompt.svg" width="720" alt="A terminal prompt with mic -41 in red and out -14 in green at the right edge">
+</p>
+
+Sevi adds two live readings to the right edge of your zsh prompt:
 
 - **mic** is how loud your surroundings are, measured by the default input device.
 - **out** is how loud the audio your Mac is playing is.
 
+It is useful when you wear headphones or hearing devices and want to see at a
+glance how loud the room is, or how loud you are playing something.
+
 Values are in dBFS (decibels relative to digital full scale): 0 is the loudest
 a signal can be, and more negative is quieter. The bar covers -60 to 0 dBFS, and
 a full block `█` appears only at 0, which means the signal is clipping.
+
+## Quick start
+
+1. Download `Sevi-<version>.zip` from the
+   [latest release](https://github.com/isureshsubramanian/Sevi/releases/latest),
+   unzip it, and put `Sevi.app` in `/Applications` or `~/Applications`.
+2. Run `~/Applications/Sevi.app/Contents/MacOS/sevi init zsh` and add the line
+   it prints to your `.zshrc`.
+3. Open a new terminal and allow the two permission prompts.
+
+Details are under [Install](#install) and [Settings](#settings).
 
 ## What Sevi captures, and what it does not
 
