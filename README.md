@@ -132,6 +132,7 @@ Set these in `.zshrc`, before the `source` line.
 |---|---|
 | `export SEVI_LIVE=1` | Updates the reading once a second while the command line is empty. It never redraws while you are typing or a completion menu is open. It uses the shell's idle timer, so it stays off if you already use `TMOUT` or `TRAPALRM`. |
 | `export SEVI_COLOR=1` | Shows the mic reading in red and the out reading in green, so the two are easy to tell apart. `off` and `--` are grey. The labels say the same thing, so nothing depends on colour alone. It is ignored when `NO_COLOR` is set. |
+| `export SEVI_ICONS=1` | Shows a microphone icon and a speaker icon in place of the words `mic` and `out`. A channel that is off shows its crossed-out icon alone. The terminal must use a [Nerd Font](https://www.nerdfonts.com), version 3 or later; with any other font the icons appear as empty boxes. The font sets the size of the icons. |
 
 ## Commands
 

@@ -10,6 +10,8 @@
 # Settings, read from the environment:
 #   SEVI_LIVE=1    redraw the reading once a second while the prompt is empty
 #   SEVI_COLOR=1   show mic in red and out in green (ignored when NO_COLOR is set)
+#   SEVI_ICONS=1   show icons in place of the words; needs a Nerd Font (version 3
+#                  or later) in the terminal, otherwise they appear as empty boxes
 #
 # State file, one line (contract version 1):
 #   1 <unix ms> <mic dBFS> <mic peak> <out dBFS> <out peak> <mic state> <out state>
@@ -53,6 +55,13 @@ typeset -g _sevi_state_file=$_sevi_dir/levels
 typeset -g _sevi_appended=''
 typeset -g _sevi_stale='mic -- · out --'
 
+# Icons for SEVI_ICONS=1, from the Material Design set of Nerd Fonts 3. The
+# plugin only prints these code points; the terminal's own font draws them.
+#   mic U+F036C, mic off U+F036D, out U+F057E, out off U+F0581
+typeset -gA _sevi_icon=(mic '󰍬' out '󰕾')
+typeset -gA _sevi_icon_off=(mic '󰍭' out '󰖁')
+typeset -g _sevi_stale_icons="${_sevi_icon[mic]} -- · ${_sevi_icon[out]} --"
+
 # Sets REPLY to the first line of file $1, or to nothing if it cannot be read.
 _sevi_read() {
   emulate -L zsh
@@ -62,13 +71,15 @@ _sevi_read() {
   return 0
 }
 
-# Sets REPLY to one channel's text. $1 label, $2 state, $3 level in dBFS,
-# $4 non-empty for colour. Callers pass only fields that _sevi_segment has
-# already validated.
+# Sets REPLY to one channel's text. $1 label (mic or out), $2 state, $3 level
+# in dBFS, $4 non-empty for colour, $5 non-empty for icons. Callers pass only
+# fields that _sevi_segment has already validated.
 _sevi_channel() {
   emulate -L zsh
+  local label=$1 off="$1 off"
+  [[ -n $5 ]] && label=$_sevi_icon[$1] off=$_sevi_icon_off[$1]
   if [[ $2 != ok ]]; then
-    REPLY="$1 off"
+    REPLY=$off
     [[ -n $4 ]] && REPLY="%F{244}$REPLY%f"
     return 0
   fi
@@ -83,18 +94,18 @@ _sevi_channel() {
   (( index > 8 )) && index=8
   local -a glyphs=(▁ ▂ ▃ ▄ ▅ ▆ ▇ █)
   if [[ -z $4 ]]; then
-    REPLY="$1 $shown ${glyphs[index]}"
+    REPLY="$label $shown ${glyphs[index]}"
     return 0
   fi
   # Colour tells the two channels apart at a glance: mic red, out green. The
-  # labels say the same thing, so colour is never the only signal.
+  # labels or icons say the same thing, so colour is never the only signal.
   local colour=green
   [[ $1 == mic ]] && colour=red
-  REPLY="%F{$colour}$1 $shown ${glyphs[index]}%f"
+  REPLY="%F{$colour}$label $shown ${glyphs[index]}%f"
 }
 
 # Sets REPLY to the prompt segment for state line $1 at time $2 (Unix ms).
-# $3 non-empty adds colour.
+# $3 non-empty adds colour, $4 non-empty shows icons in place of the words.
 #
 # The line is untrusted: it is matched whole against a strict pattern and only
 # the matched numbers and fixed state words are used. Anything else (wrong
@@ -109,7 +120,8 @@ _sevi_segment() {
   local MATCH MBEGIN MEND
   local num='-?[0-9]{1,3}\.[0-9]'
   REPLY=$_sevi_stale
-  [[ -n $3 ]] && REPLY="%F{244}$_sevi_stale%f"
+  [[ -n $4 ]] && REPLY=$_sevi_stale_icons
+  [[ -n $3 ]] && REPLY="%F{244}$REPLY%f"
 
   (( ${#line} <= 96 )) || return 0
   [[ $line =~ "^1 ([0-9]{1,15}) ($num) ($num) ($num) ($num) (ok|denied|nodevice) (ok|denied|unsupported)\$" ]] || return 0
@@ -119,28 +131,29 @@ _sevi_segment() {
   (( age > 2000 || age < -2000 )) && return 0
 
   local mic
-  _sevi_channel mic $match[6] $match[2] "$3"
+  _sevi_channel mic $match[6] $match[2] "$3" "$4"
   mic=$REPLY
-  _sevi_channel out $match[7] $match[4] "$3"
+  _sevi_channel out $match[7] $match[4] "$3" "$4"
   REPLY="$mic · $REPLY"
 }
 
 # Sets REPLY to the segment for the state file as it is right now.
-# $1 non-empty adds colour.
+# $1 non-empty adds colour, $2 non-empty shows icons.
 _sevi_current() {
   emulate -L zsh
   local -a clock=( $epochtime )
   _sevi_read $_sevi_state_file
-  _sevi_segment "$REPLY" $(( clock[1] * 1000 + clock[2] / 1000000 )) "$1"
+  _sevi_segment "$REPLY" $(( clock[1] * 1000 + clock[2] / 1000000 )) "$1" "$2"
 }
 
 # precmd hook: replaces the previous segment at the end of RPROMPT with a fresh
 # one and leaves whatever the theme put there in place.
 _sevi_precmd() {
   emulate -L zsh
-  local colour=''
+  local colour='' icons=''
   [[ $SEVI_COLOR == 1 && -z $NO_COLOR ]] && colour=1
-  _sevi_current $colour
+  [[ $SEVI_ICONS == 1 ]] && icons=1
+  _sevi_current "$colour" "$icons"
   [[ -n $_sevi_appended ]] && RPROMPT=${RPROMPT%$_sevi_appended}
   _sevi_appended="${RPROMPT:+ · }$REPLY"
   RPROMPT+=$_sevi_appended

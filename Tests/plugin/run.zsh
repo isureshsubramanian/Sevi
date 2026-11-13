@@ -146,6 +146,48 @@ check colour-stale $COLOUR_STALE $REPLY
 _sevi_segment '1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok%F{red}%n%f' $T 1
 check colour-hostile-escape $COLOUR_STALE $REPLY
 
+# Icons are opt-in and replace the words; off is the off icon alone.
+MIC='󰍬' MIC_OFF='󰍭' OUT='󰕾' OUT_OFF='󰖁'
+ICON_STALE="$MIC -- · $OUT --"
+check icon-code-points 'F036C F036D F057E F0581' \
+  "${(U)$(( [##16] #MIC ))} ${(U)$(( [##16] #MIC_OFF ))} ${(U)$(( [##16] #OUT ))} ${(U)$(( [##16] #OUT_OFF ))}"
+_sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $T '' 1
+check icons-both "$MIC -41 ▂ · $OUT -14 ▆" $REPLY
+_sevi_segment "1 $T -120.0 -120.0 -13.8 -9.0 denied ok" $T '' 1
+check icons-mic-off "$MIC_OFF · $OUT -14 ▆" $REPLY
+_sevi_segment "1 $T -41.2 -28.5 -120.0 -120.0 ok unsupported" $T '' 1
+check icons-out-off "$MIC -41 ▂ · $OUT_OFF" $REPLY
+_sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $(( T + 2001 )) '' 1
+check icons-stale $ICON_STALE $REPLY
+_sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $T 1 1
+check icons-colour "%F{red}$MIC -41 ▂%f · %F{green}$OUT -14 ▆%f" $REPLY
+_sevi_segment "1 $T -120.0 -120.0 -13.8 -9.0 nodevice ok" $T 1 1
+check icons-colour-mic-off "%F{244}$MIC_OFF%f · %F{green}$OUT -14 ▆%f" $REPLY
+_sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $(( T + 2001 )) 1 1
+check icons-colour-stale "%F{244}$ICON_STALE%f" $REPLY
+_sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $T
+check icons-off-by-default 'mic -41 ▂ · out -14 ▆' $REPLY
+
+_sevi_state_file=$fixtures/valid
+RPROMPT=''; _sevi_appended=''
+SEVI_ICONS=1 _sevi_precmd
+check hook-icons-on $ICON_STALE $RPROMPT
+RPROMPT=''; _sevi_appended=''
+SEVI_ICONS=yes _sevi_precmd
+check hook-icons-need-1 $STALE $RPROMPT
+RPROMPT=''; _sevi_appended=''
+SEVI_ICONS=1 SEVI_COLOR=1 _sevi_precmd
+check hook-icons-with-colour "%F{244}$ICON_STALE%f" $RPROMPT
+RPROMPT=''; _sevi_appended=''
+SEVI_ICONS=1 SEVI_COLOR=1 NO_COLOR=1 _sevi_precmd
+check hook-icons-without-colour $ICON_STALE $RPROMPT
+RPROMPT='14:32'; _sevi_appended=''
+SEVI_ICONS=1 _sevi_precmd; SEVI_ICONS=1 _sevi_precmd
+check hook-icons-do-not-pile-up "14:32 · $ICON_STALE" $RPROMPT
+# Switching icons off again takes the icon segment off, not just the words.
+_sevi_precmd
+check hook-icons-switched-off "14:32 · $STALE" $RPROMPT
+
 _sevi_state_file=$fixtures/valid
 RPROMPT=''; _sevi_appended=''
 SEVI_COLOR=1 _sevi_precmd
