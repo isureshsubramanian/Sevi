@@ -4,6 +4,13 @@ import SeviCore
 /// The helper's own identifier, as declared in the app bundle.
 private let bundleIdentifier = "com.nerttiyana.sevi"
 
+/// The Sevi.app this command belongs to, also when it was started through a
+/// link on the PATH. Nil when it is not inside an app bundle at all.
+func appBundle() -> Bundle? {
+    let started = Bundle.main.executablePath ?? CommandLine.arguments[0]
+    return AppBundle.containing(executable: started).flatMap { Bundle(path: $0) }
+}
+
 private struct HelperState {
     var pid: pid_t
     var since: Date?
@@ -143,14 +150,21 @@ func runDoctor() -> Int32 {
         fix("macOS \(versionText) is too old; Sevi needs 14.2 or later.")
     }
 
-    let bundlePath = Bundle.main.bundlePath
-    let inBundle = bundlePath.hasSuffix(".app") && Bundle.main.bundleIdentifier == bundleIdentifier
+    let bundle = appBundle()
+    let bundlePath = bundle?.bundlePath ?? ""
+    let inBundle = bundle?.bundleIdentifier == bundleIdentifier
     if !inBundle {
         fix("This is not running from Sevi.app, so macOS cannot ask for permissions in Sevi's name.")
     } else if bundlePath.contains("/Applications/") {
         ok("Sevi.app is installed in an Applications folder")
     } else {
         fix("Sevi.app is not in an Applications folder. Move it to /Applications or ~/Applications.")
+    }
+
+    // Two copies share one identifier, so macOS may open either of them.
+    let standardCopies = ["/Applications/Sevi.app", NSHomeDirectory() + "/Applications/Sevi.app"]
+    if standardCopies.allSatisfy({ FileManager.default.fileExists(atPath: $0) }) {
+        fix("Sevi.app is installed twice, in /Applications and in ~/Applications. Remove one so macOS always opens the same copy.")
     }
 
     if inBundle {

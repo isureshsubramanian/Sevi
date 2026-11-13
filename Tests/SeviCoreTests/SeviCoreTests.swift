@@ -501,3 +501,45 @@ import Testing
         #expect(LevelsSnapshot(stateLine: line) == nil)
     }
 }
+
+@Suite struct AppBundleTests {
+    private let root: URL
+    private let executable: URL
+
+    init() throws {
+        root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("sevi-bundle-\(UUID().uuidString)").resolvingSymlinksInPath()
+        let macOS = root.appendingPathComponent("Apps/Sevi.app/Contents/MacOS")
+        try FileManager.default.createDirectory(at: macOS, withIntermediateDirectories: true)
+        executable = macOS.appendingPathComponent("sevi")
+        FileManager.default.createFile(atPath: executable.path, contents: nil)
+    }
+
+    private func cleanUp() {
+        try? FileManager.default.removeItem(at: root)
+    }
+
+    @Test func findsTheBundleFromTheRealPath() {
+        defer { cleanUp() }
+        #expect(AppBundle.containing(executable: executable.path) == root.path + "/Apps/Sevi.app")
+    }
+
+    /// How a package manager exposes the command: a link in a folder on the PATH.
+    @Test func findsTheBundleThroughALink() throws {
+        defer { cleanUp() }
+        let bin = root.appendingPathComponent("bin")
+        try FileManager.default.createDirectory(at: bin, withIntermediateDirectories: true)
+        let link = bin.appendingPathComponent("sevi")
+        try FileManager.default.createSymbolicLink(at: link, withDestinationURL: executable)
+        #expect(AppBundle.containing(executable: link.path) == root.path + "/Apps/Sevi.app")
+    }
+
+    @Test func aLooseExecutableHasNoBundle() throws {
+        defer { cleanUp() }
+        let loose = root.appendingPathComponent("sevi")
+        FileManager.default.createFile(atPath: loose.path, contents: nil)
+        #expect(AppBundle.containing(executable: loose.path) == nil)
+        #expect(AppBundle.containing(executable: root.path + "/Apps/Sevi.app/Contents/sevi") == nil)
+        #expect(AppBundle.containing(executable: root.path + "/missing/MacOS/sevi") == nil)
+    }
+}

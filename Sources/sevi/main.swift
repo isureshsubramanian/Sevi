@@ -45,7 +45,7 @@ case "permission-report":
     exit(runPermissionReport())
 case "init":
     guard arguments.count == 2, arguments[1] == "zsh" else { fail(usage) }
-    guard let plugin = Bundle.main.path(forResource: "sevi.plugin", ofType: "zsh") else {
+    guard let plugin = appBundle()?.path(forResource: "sevi.plugin", ofType: "zsh") else {
         fail("The prompt plugin is missing from this copy of Sevi.")
     }
     // Sevi never edits .zshrc itself; this only prints the line.
