@@ -51,6 +51,16 @@ check shows-stale-before-helper-writes 0 $?
 [[ $screen != *'['[0-9]']'* ]]
 check no-job-notices 0 $?
 
+# Loading the plugin a second time in the same shell (source ~/.zshrc) must
+# not mistake its own idle timer for someone else's.
+screen=''
+zpty -w shell "source $plugin"
+watch 10
+[[ $screen != *'live refresh is off'* ]]
+check reload-keeps-live-refresh 0 $?
+sessions=( $state/sessions/*(N:t) )
+check reload-keeps-one-session 1 ${#sessions}
+
 # Live refresh: the reading changes with no key pressed.
 screen=''
 publish -41.2 -13.8

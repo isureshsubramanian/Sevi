@@ -194,8 +194,11 @@ if [[ -o interactive ]]; then
 
   if [[ $SEVI_LIVE == 1 ]]; then
     # Live refresh uses the shell's idle timer (TMOUT and TRAPALRM). If either
-    # is already in use, for example for auto-logout, it is left alone.
-    if (( ${+functions[TRAPALRM]} )) || [[ -n $TMOUT && $TMOUT != 0 ]]; then
+    # is already in use, for example for auto-logout, it is left alone. A timer
+    # this plugin set up on an earlier load (source ~/.zshrc again) is its own.
+    if [[ ${functions[TRAPALRM]} == *_sevi_live_widget* ]]; then
+      TMOUT=1
+    elif (( ${+functions[TRAPALRM]} )) || [[ -n $TMOUT && $TMOUT != 0 ]]; then
       print -u2 -r -- 'sevi: live refresh is off because TMOUT or TRAPALRM is already in use.'
     else
       TMOUT=1
