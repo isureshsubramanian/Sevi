@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Illustration of Sevi's reading with colour on: mic -41 in red with a low bar, out off in grey. Original artwork for this project. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="191" height="28" viewBox="0 0 191 28" role="img" aria-label="mic -41 in red with a low bar, out off in grey">
+  <rect width="191" height="28" rx="6" fill="#1E2130"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <text x="10" y="19" textLength="63" lengthAdjust="spacingAndGlyphs" fill="#FF6B6B">mic -41</text>
+    <rect x="82" y="18" width="9" height="4" fill="#FF6B6B"/>
+    <text x="100" y="19" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#8A8FA8">·</text>
+    <text x="118" y="19" textLength="63" lengthAdjust="spacingAndGlyphs" fill="#8A8FA8">out off</text>
+  </g>
+</svg>

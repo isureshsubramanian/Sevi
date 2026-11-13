@@ -83,10 +83,13 @@ the prompt starts it.
 
 | Prompt | Meaning |
 |---|---|
-| `mic -41 ▂ · out -14 ▆` | Both levels, in dBFS. |
-| `mic off · out -14 ▆` | The microphone is not available: permission was not granted, or there is no input device. |
-| `mic -41 ▂ · out off` | Output capture is not available. |
-| `mic -- · out --` | No fresh reading: Sevi is not listening, or it is just starting. |
+| <img src="Assets/reading-both.svg" alt="mic -41 ▂ · out -14 ▆"> | Both levels, in dBFS. |
+| <img src="Assets/reading-mic-off.svg" alt="mic off · out -14 ▆"> | The microphone is not available: permission was not granted, or there is no input device. |
+| <img src="Assets/reading-out-off.svg" alt="mic -41 ▂ · out off"> | Output capture is not available. |
+| <img src="Assets/reading-stale.svg" alt="mic -- · out --"> | No fresh reading: Sevi is not listening, or it is just starting. |
+
+The pictures show the reading with `SEVI_COLOR=1`. Without it, the same text
+appears in your prompt's own colour.
 
 A prompt is drawn once and then stays as it is, so by default the reading
 updates each time a new prompt appears. If your theme already uses the right

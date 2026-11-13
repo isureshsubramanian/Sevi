@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Illustration of Sevi's reading with colour on: mic off in grey, out -14 in green with a high bar. Original artwork for this project. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="191" height="28" viewBox="0 0 191 28" role="img" aria-label="mic off in grey, out -14 in green with a high bar">
+  <rect width="191" height="28" rx="6" fill="#1E2130"/>
+  <g font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15">
+    <text x="10" y="19" textLength="63" lengthAdjust="spacingAndGlyphs" fill="#8A8FA8">mic off</text>
+    <text x="82" y="19" textLength="9" lengthAdjust="spacingAndGlyphs" fill="#8A8FA8">·</text>
+    <text x="100" y="19" textLength="63" lengthAdjust="spacingAndGlyphs" fill="#4ADE80">out -14</text>
+    <rect x="172" y="10" width="9" height="12" fill="#4ADE80"/>
+  </g>
+</svg>
