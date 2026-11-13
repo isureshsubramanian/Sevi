@@ -49,6 +49,8 @@ func runDaemon(maxSeconds: Double?) -> Never {
             let outCounts = output.diagnostics()
             print("mic: state \(mic.reading().state.rawValue), buffers \(micCounts.callbacks), loudest \(Int(micCounts.loudest.rounded())) dBFS")
             print("out: state \(output.reading().state.rawValue), buffers \(outCounts.callbacks), loudest \(Int(outCounts.loudest.rounded())) dBFS")
+            let busy = outCounts.deviceBusyAtStart.map { $0 ? "yes" : "no" } ?? "unknown"
+            print("out: output device already in use at start: \(busy), failure: \(outCounts.failure ?? "none")")
         }
         mic.stop()
         output.stop()

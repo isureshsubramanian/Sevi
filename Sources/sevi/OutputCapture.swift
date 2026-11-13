@@ -25,6 +25,8 @@ final class OutputCapture: @unchecked Sendable {
         var state: OutputState = .unsupported
         var callbacks = 0
         var loudest = LevelMath.floorDBFS
+        var failure: String?
+        var deviceBusyAtStart: Bool?
     }
 
     private let shared = OSAllocatedUnfairLock(initialState: Shared())
@@ -85,8 +87,8 @@ final class OutputCapture: @unchecked Sendable {
     }
 
     /// Counts for a bounded self-test run: numbers only.
-    func diagnostics() -> (callbacks: Int, loudest: Double) {
-        shared.withLock { ($0.callbacks, $0.loudest) }
+    func diagnostics() -> (callbacks: Int, loudest: Double, failure: String?, deviceBusyAtStart: Bool?) {
+        shared.withLock { ($0.callbacks, $0.loudest, $0.failure, $0.deviceBusyAtStart) }
     }
 
     func reading() -> Reading {
@@ -102,6 +104,15 @@ final class OutputCapture: @unchecked Sendable {
     // MARK: - Tap lifecycle
 
     private func build() {
+        // Whether anything was already playing through the output device, taken
+        // before the tap exists. A self-test uses it to tell "nothing was
+        // playing" from "the tap heard nothing".
+        let busy = Self.defaultOutputDeviceIsBusy()
+        shared.withLock {
+            $0.failure = nil
+            $0.deviceBusyAtStart = busy
+        }
+
         guard let outputUID = Self.defaultOutputDeviceUID() else {
             fail(step: "default-device", status: 0)
             return
@@ -202,11 +213,12 @@ final class OutputCapture: @unchecked Sendable {
     private func fail(step: String, status: OSStatus) {
         Log.helper.error("output capture failed at \(step, privacy: .public), status \(status, privacy: .public)")
         tearDown()
+        shared.withLock { $0.failure = "\(step), status \(status)" }
     }
 
     // MARK: - Core Audio queries
 
-    private static func defaultOutputDeviceUID() -> String? {
+    private static func defaultOutputDevice() -> AudioObjectID? {
         var address = defaultOutputAddress
         var device = AudioObjectID(kAudioObjectUnknown)
         var size = UInt32(MemoryLayout<AudioObjectID>.size)
@@ -215,6 +227,28 @@ final class OutputCapture: @unchecked Sendable {
         ) == noErr, device != kAudioObjectUnknown else {
             return nil
         }
+        return device
+    }
+
+    private static func defaultOutputDeviceIsBusy() -> Bool? {
+        guard let device = defaultOutputDevice() else { return nil }
+        var address = AudioObjectPropertyAddress(
+            mSelector: kAudioDevicePropertyDeviceIsRunningSomewhere,
+            mScope: kAudioObjectPropertyScopeGlobal,
+            mElement: kAudioObjectPropertyElementMain
+        )
+        var running: UInt32 = 0
+        var size = UInt32(MemoryLayout<UInt32>.size)
+        guard AudioObjectGetPropertyData(device, &address, 0, nil, &size, &running) == noErr else {
+            return nil
+        }
+        return running != 0
+    }
+
+    private static func defaultOutputDeviceUID() -> String? {
+        guard let device = defaultOutputDevice() else { return nil }
+        var address = defaultOutputAddress
+        var size = UInt32(MemoryLayout<AudioObjectID>.size)
 
         address.mSelector = kAudioDevicePropertyDeviceUID
         var uid: Unmanaged<CFString>?

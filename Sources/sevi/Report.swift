@@ -167,12 +167,18 @@ func runDoctor() -> Int32 {
             note("microphone permission: could not be checked.")
         }
     }
-    note("system audio permission: macOS offers no way to check it. If \"out\" stays silent while audio plays, allow Sevi for system audio recording under System Settings > Privacy & Security.")
+    note("system audio permission: macOS offers no way to check it directly; see the reading below.")
 
     if let state = helperState() {
         ok("listening since \(clock(state.since)), used by \(state.sessions) terminal(s)")
         if let snapshot = state.snapshot, isFresh(state) {
             ok("fresh reading: mic \(describe(mic: snapshot)), out \(describe(out: snapshot))")
+            // A denied system-audio permission gives no error: the tap keeps
+            // delivering buffers of pure silence, exactly as it does when
+            // nothing is playing. So the two cannot be told apart from here.
+            if snapshot.outState == .ok, snapshot.outLevel <= LevelMath.floorDBFS {
+                note("\"out\" is complete silence. That is normal when nothing is playing. If audio is playing right now, Sevi has not been allowed to record system audio: allow it under System Settings > Privacy & Security, then run 'sevi stop' and open a new terminal.")
+            }
             if snapshot.micState == .nodevice {
                 note("no input device was found; connect or select a microphone.")
             }

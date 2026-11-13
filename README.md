@@ -48,8 +48,10 @@ listening, macOS shows its microphone indicator.
 3. Open a new terminal.
 
 The first time, macOS asks twice: once for the microphone and once for system
-audio. Both prompts name Sevi. If you decline one, that half of the reading
-shows `off` or stays silent, and the other half still works.
+audio. Both prompts name Sevi. If you decline the microphone, `mic` shows
+`off`. If you decline system audio, `out` stays at `-120 ▁`, the same as when
+nothing is playing, because macOS reports a declined system-audio permission
+as silence. The other half still works either way.
 
 Sevi has no window and no Dock icon. You never need to open the app yourself;
 the prompt starts it.
