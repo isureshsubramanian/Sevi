@@ -95,6 +95,12 @@ print -r -- "1 $T -41.2 -28.5 -13.8 -9.0 ok ok"$'\n''$(touch pwned)' > $fixtures
 _sevi_read $fixtures/second-line; _sevi_segment "$REPLY" $T
 check second-line-ignored 'mic -41 ▂ · out -14 ▆' $REPLY
 
+# The state path follows the per-user temporary folder, not a shell's TMPDIR.
+expected_path="${$(/usr/bin/getconf DARWIN_USER_TEMP_DIR)%/}/sevi-${UID}/levels"
+check path-default $expected_path $_sevi_state_file
+check path-ignores-tmpdir $expected_path \
+  "$(TMPDIR=/somewhere/else zsh -fc 'source $1; print -r -- $_sevi_state_file' _ $here/../../sevi.plugin.zsh)"
+
 # The precmd hook and RPROMPT. The reading here is long stale, so the segment is
 # fixed whatever the clock says.
 _sevi_state_file=$fixtures/valid

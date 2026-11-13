@@ -11,15 +11,25 @@
 #
 # Shared invariants with the helper. Change either only together with the
 # other side:
-#   - Path (Sources/SeviCore/StatePaths.swift): $TMPDIR with one trailing slash
-#     removed, /tmp when unset or empty, then /sevi-$UID/levels.
+#   - Path (Sources/SeviCore/StatePaths.swift): the per-user temporary folder
+#     macOS assigns (DARWIN_USER_TEMP_DIR, one trailing slash removed), then
+#     /sevi-$UID/levels. $TMPDIR, then /tmp, are used only if the system gives
+#     no answer: a shell may override $TMPDIR, and the app never sees that.
 #   - Line format (Sources/SeviCore/LevelsSnapshot.swift): the pattern in
 #     _sevi_segment accepts exactly what the helper formats.
 
 zmodload zsh/datetime
 autoload -Uz add-zsh-hook
 
-typeset -g _sevi_state_file="${${TMPDIR:-/tmp}%/}/sevi-${UID}/levels"
+typeset -g _sevi_state_file
+# Runs once when the plugin loads; nothing is forked per prompt.
+() {
+  emulate -L zsh
+  local dir
+  dir=$(/usr/bin/getconf DARWIN_USER_TEMP_DIR 2>/dev/null) || dir=''
+  [[ -n $dir ]] || dir=${TMPDIR:-/tmp}
+  _sevi_state_file="${dir%/}/sevi-${UID}/levels"
+}
 # What the hook appended to RPROMPT last time, so it can take it off again.
 typeset -g _sevi_appended=''
 
