@@ -11,6 +11,9 @@ enum Log {
 /// when it is drawn, so a faster rate buys nothing.
 private let writeInterval = DispatchTimeInterval.milliseconds(250)
 
+/// The session files are looked at on every this-many-th write: every 5 seconds.
+private let sessionCheckEvery = 20
+
 /// Listens and publishes levels until told to stop.
 ///
 /// This must run inside Sevi.app, started by macOS opening the app. Run from a
@@ -54,6 +57,9 @@ func runDaemon(maxSeconds: Double?) -> Never {
         exit(0)
     }
 
+    let sessions = SessionRegistry(paths: paths)
+    var idle = IdleExit()
+    var tick = 0
     let timer = DispatchSource.makeTimerSource(queue: .main)
     timer.schedule(deadline: .now(), repeating: writeInterval)
     timer.setEventHandler {
@@ -71,6 +77,16 @@ func runDaemon(maxSeconds: Double?) -> Never {
         // A failed write leaves the last reading in place; the prompt shows it
         // as stale after two seconds.
         try? writer.write(snapshot)
+
+        // Listen only while a terminal session with the plugin is open.
+        tick += 1
+        if tick % sessionCheckEvery == 0 {
+            let now = Double(DispatchTime.now().uptimeNanoseconds) / 1e9
+            if idle.shouldExit(liveSessions: sessions.liveSessions(), at: now) {
+                Log.helper.notice("no sessions left")
+                shutDown()
+            }
+        }
 
         if let maxSeconds {
             let elapsed = Double(DispatchTime.now().uptimeNanoseconds - started.uptimeNanoseconds) / 1e9

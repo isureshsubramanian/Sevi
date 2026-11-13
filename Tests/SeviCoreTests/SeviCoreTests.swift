@@ -346,3 +346,111 @@ import Testing
         #expect(TapFormat.meterSampleRate(sampleRate: 48_000, channels: 0, isInterleaved: true, isFloat32: true) == nil)
     }
 }
+
+@Suite struct SessionRegistryTests {
+    private let root: String
+    private let registry: SessionRegistry
+
+    init() throws {
+        root = FileManager.default.temporaryDirectory
+            .appendingPathComponent("sevi-sessions-\(UUID().uuidString)").path
+        registry = SessionRegistry(paths: StatePaths(tmpdir: root, uid: getuid()))
+        try FileManager.default.createDirectory(atPath: registry.directory, withIntermediateDirectories: true)
+    }
+
+    private func register(_ name: String) {
+        FileManager.default.createFile(atPath: registry.directory + "/" + name, contents: nil)
+    }
+
+    private func exists(_ name: String) -> Bool {
+        FileManager.default.fileExists(atPath: registry.directory + "/" + name)
+    }
+
+    private func cleanUp() {
+        try? FileManager.default.removeItem(atPath: root)
+    }
+
+    @Test func noDirectoryMeansNoSessions() {
+        defer { cleanUp() }
+        let elsewhere = SessionRegistry(paths: StatePaths(tmpdir: root + "/missing", uid: getuid()))
+        #expect(elsewhere.liveSessions() == 0)
+    }
+
+    @Test func countsARunningShellAndKeepsItsFile() {
+        defer { cleanUp() }
+        register("\(getpid())")
+        #expect(registry.liveSessions() == 1)
+        #expect(exists("\(getpid())"))
+    }
+
+    @Test func removesTheFileOfAProcessThatIsGone() {
+        defer { cleanUp() }
+        register("4242")
+        #expect(registry.liveSessions(processStart: { _ in nil }) == 0)
+        #expect(!exists("4242"))
+    }
+
+    /// The shell died and its process ID now belongs to something newer.
+    @Test func aReusedProcessIDDoesNotCount() {
+        defer { cleanUp() }
+        register("4242")
+        let later = Date().addingTimeInterval(60)
+        #expect(registry.liveSessions(processStart: { _ in later }) == 0)
+        #expect(!exists("4242"))
+    }
+
+    @Test func countsEachLiveSession() {
+        defer { cleanUp() }
+        register("4242")
+        register("4243")
+        register("4244")
+        let earlier = Date().addingTimeInterval(-60)
+        #expect(registry.liveSessions(processStart: { $0 == 4243 ? nil : earlier }) == 2)
+        #expect(exists("4242") && !exists("4243") && exists("4244"))
+    }
+
+    @Test func ignoresNamesThatAreNotProcessIDs() {
+        defer { cleanUp() }
+        for name in ["notes", "12x", "-5", "1", "0", "99999999999999999999"] {
+            register(name)
+        }
+        let earlier = Date().addingTimeInterval(-60)
+        #expect(registry.liveSessions(processStart: { _ in earlier }) == 0)
+        #expect(exists("notes") && exists("12x") && exists("1"))
+    }
+
+    @Test func aDirectoryNamedLikeAProcessIDDoesNotCount() throws {
+        defer { cleanUp() }
+        try FileManager.default.createDirectory(atPath: registry.directory + "/4242", withIntermediateDirectories: false)
+        let earlier = Date().addingTimeInterval(-60)
+        #expect(registry.liveSessions(processStart: { _ in earlier }) == 0)
+    }
+
+    @Test func findsTheStartTimeOfThisProcessOnly() {
+        defer { cleanUp() }
+        let started = SessionRegistry.processStartTime(getpid())
+        #expect(started != nil)
+        #expect((started ?? .distantFuture) <= Date())
+        #expect(SessionRegistry.processStartTime(99_999_999) == nil)
+    }
+}
+
+@Suite struct IdleExitTests {
+    /// Feeds (live sessions, time) pairs in order and returns each answer.
+    private func answers(_ steps: [(Int, Double)], grace: Double = 30) -> [Bool] {
+        var idle = IdleExit(grace: grace)
+        return steps.map { idle.shouldExit(liveSessions: $0.0, at: $0.1) }
+    }
+
+    @Test func staysWhileASessionIsLive() {
+        #expect(answers([(1, 0), (2, 1_000)]) == [false, false])
+    }
+
+    @Test func exitsOnlyAfterTheGracePeriod() {
+        #expect(answers([(0, 100), (0, 129.9), (0, 130)]) == [false, false, true])
+    }
+
+    @Test func aNewSessionResetsTheCountdown() {
+        #expect(answers([(0, 0), (1, 20), (0, 40), (0, 69), (0, 70)]) == [false, false, false, false, true])
+    }
+}

@@ -5,6 +5,7 @@ test-swift:
 
 test-plugin:
 	zsh -f Tests/plugin/run.zsh
+	zsh -f Tests/plugin/live.zsh
 
 test: test-swift test-plugin
 

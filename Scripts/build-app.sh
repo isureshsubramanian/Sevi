@@ -19,6 +19,7 @@ mkdir -p build/Sevi.app/Contents/MacOS build/Sevi.app/Contents/Resources
 cp "$binary" build/Sevi.app/Contents/MacOS/sevi
 cp Packaging/Info.plist build/Sevi.app/Contents/Info.plist
 cp Packaging/AppIcon.icns build/Sevi.app/Contents/Resources/AppIcon.icns
+cp sevi.plugin.zsh build/Sevi.app/Contents/Resources/sevi.plugin.zsh
 
 identity="${SEVI_SIGN_IDENTITY:-$(security find-identity -v -p codesigning | awk '/Developer ID Application/ { print $2; exit }')}"
 if [ -z "$identity" ]; then
