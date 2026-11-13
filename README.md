@@ -31,12 +31,15 @@ listening, macOS shows its microphone indicator.
 
 ## Requirements
 
-- macOS 14.2 or later
+- macOS 14.2 or later, on a Mac with Apple silicon
 - zsh, plain or with Oh My Zsh
 
 ## Install
 
-1. Put `Sevi.app` in `/Applications` or `~/Applications`.
+1. Download `Sevi-<version>.zip` from the
+   [Releases](https://github.com/isureshsubramanian/Sevi/releases) page, unzip
+   it, and put `Sevi.app` in `/Applications` or `~/Applications`. The app is
+   signed and notarised.
 2. Ask Sevi for the line to add to your `.zshrc`:
 
    ```
