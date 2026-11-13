@@ -131,6 +131,18 @@ check hook-fresh-reading 'mic -41 ▂ · out -14 ▆' $RPROMPT
 
 check hook-is-registered 1 ${precmd_functions[(I)_sevi_precmd]}
 
+# Loading the plugin again in the same shell (source ~/.zshrc) must not leave
+# the earlier segment behind when no theme rebuilds RPROMPT.
+_sevi_state_file=$fixtures/valid
+RPROMPT='14:32'; _sevi_appended=''
+_sevi_precmd
+source $here/../../sevi.plugin.zsh
+_sevi_state_file=$fixtures/valid
+check reload-takes-old-segment-off '14:32' $RPROMPT
+_sevi_precmd
+check reload-one-segment "14:32 · $STALE" $RPROMPT
+check reload-hook-registered-once 1 ${#${(M)precmd_functions:#_sevi_precmd}}
+
 # Colour is opt-in: mic red, out green, whatever the level; off and stale grey.
 COLOUR_STALE='%F{244}mic -- · out --%f'
 _sevi_segment "1 $T -41.2 -28.5 -13.8 -9.0 ok ok" $T 1

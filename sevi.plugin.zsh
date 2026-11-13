@@ -52,6 +52,9 @@ typeset -g _sevi_state_file=$_sevi_dir/levels
 (( ${+_sevi_open} )) || typeset -ga _sevi_open=(/usr/bin/open -gj -b com.nerttiyana.sevi --args daemon)
 
 # What the hook appended to RPROMPT last time, so it can take it off again.
+# When the plugin is loaded again in the same shell, the earlier load's segment
+# is taken off first; otherwise it would stay next to the new one.
+[[ -n ${_sevi_appended-} ]] && RPROMPT=${RPROMPT%$_sevi_appended}
 typeset -g _sevi_appended=''
 typeset -g _sevi_stale='mic -- · out --'
 
