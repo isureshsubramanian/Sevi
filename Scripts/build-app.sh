@@ -33,8 +33,14 @@ if [ -z "$identity" ]; then
 fi
 
 # Hardened runtime is required for notarisation; the entitlement lets a
-# hardened build open the microphone. No timestamp here: release signing adds it.
-codesign --force --options runtime --timestamp=none \
+# hardened build open the microphone. A release (SEVI_RELEASE=1) is signed with
+# a secure timestamp from Apple's server, which notarisation also requires;
+# development builds skip it so they can be built offline.
+timestamp="--timestamp=none"
+if [ "${SEVI_RELEASE:-0}" = 1 ]; then
+    timestamp="--timestamp"
+fi
+codesign --force --options runtime "$timestamp" \
     --entitlements Packaging/Sevi.entitlements -s "$identity" build/Sevi.app
 codesign --verify --strict build/Sevi.app
 echo "built build/Sevi.app"
