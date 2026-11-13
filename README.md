@@ -24,12 +24,17 @@ a full block `█` appears only at 0, which means the signal is clipping.
 
 ## Quick start
 
-1. Download `Sevi-<version>.zip` from the
-   [latest release](https://github.com/isureshsubramanian/Sevi/releases/latest),
-   unzip it, and put `Sevi.app` in `/Applications` or `~/Applications`.
-2. Run `~/Applications/Sevi.app/Contents/MacOS/sevi init zsh` and add the line
-   it prints to your `.zshrc`.
+1. Install with [Homebrew](https://brew.sh):
+
+   ```
+   brew install --cask isureshsubramanian/sevi/sevi
+   ```
+
+2. Run `sevi init zsh` and add the line it prints to your `.zshrc`.
 3. Open a new terminal and allow the two permission prompts.
+
+You can also install it by hand from the
+[latest release](https://github.com/isureshsubramanian/Sevi/releases/latest).
 
 Details are under [Install](#install) and [Settings](#settings).
 
@@ -55,6 +60,30 @@ listening, macOS shows its microphone indicator.
 - zsh, plain or with Oh My Zsh
 
 ## Install
+
+### With Homebrew
+
+1. Install the app and the `sevi` command:
+
+   ```
+   brew install --cask isureshsubramanian/sevi/sevi
+   ```
+
+   This puts `Sevi.app` in `/Applications`. The app is signed and notarised.
+2. Ask Sevi for the line to add to your `.zshrc`:
+
+   ```
+   sevi init zsh
+   ```
+
+   Sevi never edits `.zshrc` itself. Add the printed `source` line after your
+   theme or Oh My Zsh is loaded.
+3. Open a new terminal.
+
+`brew upgrade --cask sevi` installs a newer version. Terminals that are already
+open keep the old plugin until you reopen them.
+
+### By hand
 
 1. Download `Sevi-<version>.zip` from the
    [Releases](https://github.com/isureshsubramanian/Sevi/releases) page, unzip
@@ -106,7 +135,8 @@ Set these in `.zshrc`, before the `source` line.
 
 ## Commands
 
-Run these as `~/Applications/Sevi.app/Contents/MacOS/sevi <command>`.
+With Homebrew, run these as `sevi <command>`. Installed by hand, run them as
+`~/Applications/Sevi.app/Contents/MacOS/sevi <command>`.
 
 | Command | What it does |
 |---|---|
@@ -130,6 +160,12 @@ Run these as `~/Applications/Sevi.app/Contents/MacOS/sevi <command>`.
   reading. Plain zsh and Oh My Zsh themes are supported.
 
 ## Uninstall
+
+With Homebrew: remove the `source` line from `.zshrc`, close your terminals,
+and run `brew uninstall --zap --cask sevi`. That also removes the permissions
+macOS stored.
+
+By hand:
 
 1. Remove the `source` line from `.zshrc` and close your terminals.
 2. Delete `Sevi.app`.
