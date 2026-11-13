@@ -58,6 +58,46 @@ public struct LevelsSnapshot: Equatable, Sendable {
         return fields.joined(separator: " ") + "\n"
     }
 
+    /// Reads a state line back. Accepts exactly what `stateLine` writes (with or
+    /// without the final newline) and nothing else, the same rule the plugin
+    /// applies.
+    public init?(stateLine: String) {
+        var line = Substring(stateLine)
+        if line.hasSuffix("\n") { line = line.dropLast() }
+        let fields = line.split(separator: " ", omittingEmptySubsequences: false)
+        guard line.utf8.count <= 96, fields.count == 8,
+              fields[0] == String(Self.contractVersion),
+              (1...15).contains(fields[1].utf8.count),
+              fields[1].utf8.allSatisfy({ $0 >= 0x30 && $0 <= 0x39 }),
+              let timestamp = Int64(fields[1]),
+              let micLevel = Self.level(fields[2]), let micPeak = Self.level(fields[3]),
+              let outLevel = Self.level(fields[4]), let outPeak = Self.level(fields[5]),
+              let micState = MicState(rawValue: String(fields[6])),
+              let outState = OutputState(rawValue: String(fields[7]))
+        else {
+            return nil
+        }
+        self.init(
+            timestampMs: timestamp,
+            micLevel: micLevel, micPeak: micPeak, outLevel: outLevel, outPeak: outPeak,
+            micState: micState, outState: outState
+        )
+    }
+
+    /// An optional minus, one to three digits, a dot, one digit.
+    private static func level(_ field: Substring) -> Double? {
+        let digits = field.hasPrefix("-") ? field.dropFirst() : field
+        let parts = digits.split(separator: ".", omittingEmptySubsequences: false)
+        let isDigit: (UInt8) -> Bool = { $0 >= 0x30 && $0 <= 0x39 }
+        guard parts.count == 2,
+              (1...3).contains(parts[0].utf8.count), parts[0].utf8.allSatisfy(isDigit),
+              parts[1].utf8.count == 1, parts[1].utf8.allSatisfy(isDigit)
+        else {
+            return nil
+        }
+        return Double(field)
+    }
+
     /// One decimal, always with a dot, never "-0.0", clamped to the dBFS range.
     /// Built from integers so no locale can change the decimal separator.
     private static func field(_ dbfs: Double) -> String {

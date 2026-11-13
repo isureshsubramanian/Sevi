@@ -454,3 +454,50 @@ import Testing
         #expect(answers([(0, 0), (1, 20), (0, 40), (0, 69), (0, 70)]) == [false, false, false, false, true])
     }
 }
+
+@Suite struct StateLineParsingTests {
+    private let example = "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok"
+
+    @Test func readsTheContractExample() throws {
+        let snapshot = try #require(LevelsSnapshot(stateLine: example + "\n"))
+        #expect(snapshot.timestampMs == 1_794_582_555_927)
+        #expect(snapshot.micLevel == -41.2 && snapshot.micPeak == -28.5)
+        #expect(snapshot.outLevel == -13.8 && snapshot.outPeak == -9.0)
+        #expect(snapshot.micState == .ok && snapshot.outState == .ok)
+        #expect(LevelsSnapshot(stateLine: example) == snapshot)
+    }
+
+    @Test func roundTripsWhatItWrites() {
+        let written = LevelsSnapshot(
+            timestampMs: 42, micLevel: -120, micPeak: 0, outLevel: -0.1, outPeak: -59.9,
+            micState: .nodevice, outState: .denied
+        )
+        #expect(LevelsSnapshot(stateLine: written.stateLine) == written)
+    }
+
+    /// The same malformed and hostile lines the plugin tests reject.
+    @Test(arguments: [
+        "",
+        "2 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 -41.2 -28.5",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok ok",
+        "1 1794582555927 -41 -28 -13 -9 ok ok",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok maybe",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 unsupported nodevice",
+        " 1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok ",
+        "1 1794582555927  -41.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 -4111.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927179458255 -41.2 -28.5 -13.8 -9.0 ok ok",
+        "1 +1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 --41.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 -4e1.2 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 nan.0 -28.5 -13.8 -9.0 ok ok",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok $(touch pwned)",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok%F{red}%n%f",
+        "1 1794582555927 -41.2 -28.5 -13.8 -9.0 ok ok\n\n",
+    ])
+    func rejects(line: String) {
+        #expect(LevelsSnapshot(stateLine: line) == nil)
+    }
+}

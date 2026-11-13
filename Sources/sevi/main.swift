@@ -6,6 +6,8 @@ let usage = """
       daemon [--for <seconds>]   listen and publish sound levels; started by
                                  opening Sevi.app, not from a shell
       stop                       stop listening now
+      status                     say whether Sevi is listening, and since when
+      doctor                     check the setup and permissions
       init zsh                   print the line to add to your .zshrc
     """
 
@@ -32,6 +34,15 @@ case "daemon":
 case "stop":
     guard arguments.count == 1 else { fail(usage) }
     exit(runStop())
+case "status":
+    guard arguments.count == 1 else { fail(usage) }
+    exit(runStatus())
+case "doctor":
+    guard arguments.count == 1 else { fail(usage) }
+    exit(runDoctor())
+case "permission-report":
+    // Not in the usage text: `doctor` runs this through macOS.
+    exit(runPermissionReport())
 case "init":
     guard arguments.count == 2, arguments[1] == "zsh" else { fail(usage) }
     guard let plugin = Bundle.main.path(forResource: "sevi.plugin", ofType: "zsh") else {
